@@ -238,39 +238,46 @@ window.startTest = async function (testId) {
 
         currentTest = { id: testId, ...testDoc.data() };
 
-        // Загружаем вопросы
-        const q = query(collection(window.db, 'tests', testId, 'questions'), orderBy('order'));
-        const questionsSnapshot = await getDocs(collection(window.db, 'tests', testId, 'questions'));
+        // Загружаем вопросы (С УЧЁТОМ order)
+        const q = query(
+            collection(window.db, 'tests', testId, 'questions'),
+            orderBy('order')
+        );
+
+        const questionsSnapshot = await getDocs(q);
         const questions = [];
-        questionsSnapshot.forEach(doc => {
-            const questionData = doc.data();
+
+        questionsSnapshot.forEach(docSnap => {
+            const questionData = docSnap.data();
 
             // Перемешиваем варианты ответов
             const options = [...questionData.options];
             const correctAnswer = options[questionData.correctAnswerIndex];
 
-            // Shuffle options
             for (let i = options.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [options[i], options[j]] = [options[j], options[i]];
             }
 
-            // Находим новый индекс правильного ответа
             const newCorrectIndex = options.indexOf(correctAnswer);
 
             questions.push({
-                id: doc.id,
-                ...questionData,
+                id: docSnap.id,
+                text: questionData.text,
                 options: options,
-                correctAnswerIndex: newCorrectIndex
+                correctAnswerIndex: newCorrectIndex,
+                points: questionData.points ?? 1
             });
         });
 
-        // Перемешиваем сами вопросы
+        // Перемешиваем вопросы
         for (let i = questions.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [questions[i], questions[j]] = [questions[j], questions[i]];
         }
+
+        // 🔥 ГЛАВНЫЙ ФИКС
+        currentQuestions = questions;
 
         if (currentQuestions.length === 0) {
             alert('В тесте нет вопросов');
@@ -280,7 +287,7 @@ window.startTest = async function (testId) {
         // Сброс выбранных ответов
         selectedAnswers = {};
 
-        // Отображаем тест
+        // Показываем тест
         showTestModal();
 
     } catch (error) {
@@ -288,6 +295,7 @@ window.startTest = async function (testId) {
         alert('Ошибка загрузки теста: ' + error.message);
     }
 };
+
 
 // ==========================================
 // ПОКАЗАТЬ МОДАЛКУ ТЕСТА
