@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam System - Вход</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="auth-box">
+            <h1>🎓 Система Экзаменов</h1>
+
+            <!-- Табы для переключения между входом и регистрацией -->
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('login')">Вход</button>
+                <button class="tab" onclick="showTab('register')">Регистрация</button>
+            </div>
+
+            <!-- Форма входа -->
+            <div id="loginForm" class="form-container active">
+                <h2>Вход в систему</h2>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" required placeholder="example@school.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль</label>
+                        <input type="password" id="loginPassword" required placeholder="Минимум 6 символов">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Войти</button>
+                </form>
+            </div>
+
+            <!-- Форма регистрации -->
+            <div id="registerForm" class="form-container">
+                <h2>Регистрация</h2>
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Полное имя</label>
+                        <input type="text" id="registerName" required placeholder="Иван Иванов">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" required placeholder="example@school.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль</label>
+                        <input type="password" id="registerPassword" required placeholder="Минимум 6 символов">
+                    </div>
+                    <div class="form-group">
+                        <label>Я регистрируюсь как:</label>
+                        <select id="registerRole" onchange="toggleGroupSelect()" required>
+                            <option value="">Выберите роль</option>
+                            <option value="teacher">Учитель</option>
+                            <option value="student">Студент</option>
+                        </select>
+                    </div>
+
+                    <!-- Выбор курса (только для студентов) -->
+                    <div id="courseSelectContainer" class="form-group" style="display: none;">
+                        <label>Курс</label>
+                        <select id="registerCourse">
+                            <option value="">Выберите курс</option>
+                            <option value="1">1 курс</option>
+                            <option value="2">2 курс</option>
+                            <option value="3">3 курс</option>
+                            <option value="4">4 курс</option>
+                        </select>
+                    </div>
+
+                    <!-- Выбор группы (только для студентов) -->
+                    <div id="groupSelectContainer" class="form-group" style="display: none;">
+                        <label>Выберите группу</label>
+                        <select id="registerGroup">
+                            <option value="">Загрузка групп...</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                </form>
+            </div>
+
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // ВСТАВЬ СЮДА СВОЙ FIREBASE CONFIG
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLTetipjEMhn5FK0CvePE0NKvFNPOm7m8",
+            authDomain: "ex-test-back.firebaseapp.com",
+            projectId: "ex-test-back",
+            storageBucket: "ex-test-back.firebasestorage.app",
+            messagingSenderId: "209371697034",
+            appId: "1:209371697034:web:492a36d6f63326fa8f8273",
+            measurementId: "G-V1RLP62KJK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
+    </script>
+
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>

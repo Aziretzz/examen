@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет студента</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <div>
+                    <h1>👨‍🎓 Личный кабинет студента</h1>
+                </div>
+                <div class="user-info">
+                    <p><strong id="userName"></strong></p>
+                    <p id="userEmail"></p>
+                    <p>Группа: <span id="groupName"></span></p>
+                    <p>Курс: <span id="courseName"></span></p>
+                    <button onclick="handleLogout()" class="btn btn-secondary">Выйти</button>
+                </div>
+            </div>
+
+            <!-- Статистика -->
+            <div class="stats" id="stats">
+                <div class="stat-card">
+                    <h3 id="testsAvailable">0</h3>
+                    <p>Доступных тестов</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="testsCompleted">0</h3>
+                    <p>Тестов пройдено</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="averageScore">0%</h3>
+                    <p>Средний балл</p>
+                </div>
+            </div>
+
+            <!-- Доступные тесты -->
+            <div class="section">
+                <h2>📝 Доступные тесты</h2>
+                <div id="availableTestsList" class="grid">
+                    <p class="loading">Загрузка тестов...</p>
+                </div>
+            </div>
+
+            <!-- Мои результаты -->
+            <div class="section">
+                <h2>📊 Мои результаты</h2>
+                <div id="resultsList">
+                    <p class="loading">Загрузка результатов...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка прохождения теста -->
+    <div id="testModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="testModalTitle">Тест</h2>
+                <div id="timerDisplay" class="badge badge-info" style="font-size: 18px; padding: 10px 20px;"></div>
+            </div>
+            <div id="testContent">
+                <p class="loading">Загрузка вопросов...</p>
+            </div>
+            <button id="submitTestBtn" onclick="submitTest()" class="btn btn-primary"
+                style="display: none; margin-top: 20px;">Завершить тест</button>
+        </div>
+    </div>
+
+    <!-- Модалка результата -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Результат теста</h2>
+                <button class="close-btn" onclick="closeModal('resultModal')">&times;</button>
+            </div>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLTetipjEMhn5FK0CvePE0NKvFNPOm7m8",
+            authDomain: "ex-test-back.firebaseapp.com",
+            projectId: "ex-test-back",
+            storageBucket: "ex-test-back.firebasestorage.app",
+            messagingSenderId: "209371697034",
+            appId: "1:209371697034:web:492a36d6f63326fa8f8273",
+            measurementId: "G-V1RLP62KJK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
+    </script>
+
+    <script type="module" src="student.js"></script>
+</body>
+
+</html>

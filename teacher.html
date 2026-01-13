@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет учителя</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <div>
+                    <h1>👨‍🏫 Личный кабинет учителя</h1>
+                </div>
+                <div class="user-info">
+                    <p><strong id="userName"></strong></p>
+                    <p id="userEmail"></p>
+                    <button onclick="handleLogout()" class="btn btn-secondary">Выйти</button>
+                </div>
+            </div>
+
+            <!-- Статистика -->
+            <div class="stats" id="stats">
+                <div class="stat-card">
+                    <h3 id="groupsCount">0</h3>
+                    <p>Групп создано</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="testsCount">0</h3>
+                    <p>Тестов создано</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="studentsCount">0</h3>
+                    <p>Студентов</p>
+                </div>
+            </div>
+            <!-- Группы -->
+            <div class="section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>📚 Мои группы</h2>
+                    <button onclick="showCreateGroupModal()" class="btn btn-primary">+ Создать группу</button>
+                </div>
+                <div id="groupsList" class="grid">
+                    <p class="loading">Загрузка групп...</p>
+                </div>
+            </div>
+
+            <!-- Тесты -->
+            <div class="section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>📝 Мои тесты</h2>
+                    <button onclick="showCreateTestModal()" class="btn btn-primary">+ Создать тест</button>
+                </div>
+                <div id="testsList" class="grid">
+                    <p class="loading">Загрузка тестов...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка создания группы -->
+    <div id="createGroupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Создать группу</h2>
+                <button class="close-btn" onclick="closeModal('createGroupModal')">&times;</button>
+            </div>
+            <form onsubmit="createGroup(event)">
+                <div class="form-group">
+                    <label>Название группы</label>
+                    <input type="text" id="groupName" required placeholder="Математика 10-А">
+                </div>
+                <button type="submit" class="btn btn-primary">Создать</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модалка редактирования группы -->
+    <div id="editGroupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Редактировать группу</h2>
+                <button class="close-btn" onclick="closeModal('editGroupModal')">&times;</button>
+            </div>
+            <form onsubmit="updateGroup(event)">
+                <input type="hidden" id="editGroupId">
+                <div class="form-group">
+                    <label>Название группы</label>
+                    <input type="text" id="editGroupName" required placeholder="Математика 10-А">
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модалка создания теста -->
+    <div id="createTestModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Создать тест</h2>
+                <button class="close-btn" onclick="closeModal('createTestModal')">&times;</button>
+            </div>
+            <form onsubmit="createTest(event)">
+                <div class="form-group">
+                    <label>Название теста</label>
+                    <input type="text" id="testTitle" required placeholder="Алгебра - Контрольная">
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea id="testDescription" required placeholder="Тест по квадратным уравнениям" rows="3"
+                        style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-family: inherit;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Группы (выберите одну или несколько)</label>
+                    <div id="testGroups"
+                        style="max-height: 200px; overflow-y: auto; border: 2px solid #e0e0e0; border-radius: 10px; padding: 10px;">
+                        <p style="color: #999;">Загрузка групп...</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Длительность (минуты)</label>
+                    <input type="number" id="testDuration" required min="5" max="240" value="45">
+                </div>
+
+                <h3 style="margin: 30px 0 15px;">Вопросы</h3>
+                <div id="questionsList"></div>
+                <button type="button" onclick="addQuestion()" class="btn btn-secondary" style="margin-bottom: 20px;">+
+                    Добавить вопрос</button>
+
+                <button type="submit" class="btn btn-primary">Создать тест</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модалка редактирования теста -->
+    <div id="editTestModal" class="modal">
+        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2>Редактировать тест</h2>
+                <button class="close-btn" onclick="closeModal('editTestModal')">&times;</button>
+            </div>
+            <form onsubmit="updateTest(event)">
+                <input type="hidden" id="editTestId">
+                
+                <h3>Основная информация</h3>
+                
+                <div class="form-group">
+                    <label>Название теста</label>
+                    <input type="text" id="editTestTitle" required placeholder="Алгебра: Квадратные уравнения">
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea id="editTestDescription" required rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Длительность (минуты)</label>
+                    <input type="number" id="editTestDuration" required min="1" value="45">
+                </div>
+                
+                <hr style="margin: 30px 0; border: none; border-top: 2px solid #e0e0e0;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0;">Вопросы</h3>
+                    <button type="button" onclick="addEditQuestion()" class="btn btn-primary" style="width: auto; padding: 10px 20px;">+ Добавить вопрос</button>
+                </div>
+                
+                <div id="editQuestionsList"></div>
+                
+                <div style="margin-top: 30px; display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    <button type="button" onclick="closeModal('editTestModal')" class="btn btn-secondary">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модалка просмотра результатов -->
+    <div id="resultsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="resultsModalTitle">Результаты теста</h2>
+                <button class="close-btn" onclick="closeModal('resultsModal')">&times;</button>
+            </div>
+            
+            <!-- Фильтры внутри результатов -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <h4 style="margin-bottom: 10px;">🔍 Фильтры результатов</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                    <div class="form-group" style="margin: 0;">
+                        <label>По группе</label>
+                        <select id="resultsFilterGroup" onchange="filterResults()">
+                            <option value="">Все группы</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>По курсу</label>
+                        <select id="resultsFilterCourse" onchange="filterResults()">
+                            <option value="">Все курсы</option>
+                            <option value="1">1 курс</option>
+                            <option value="2">2 курс</option>
+                            <option value="3">3 курс</option>
+                            <option value="4">4 курс</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button onclick="resetResultsFilters()" class="btn btn-secondary" style="width: 100%;">Сбросить</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="resultsContent">
+                <p class="loading">Загрузка результатов...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLTetipjEMhn5FK0CvePE0NKvFNPOm7m8",
+            authDomain: "ex-test-back.firebaseapp.com",
+            projectId: "ex-test-back",
+            storageBucket: "ex-test-back.firebasestorage.app",
+            messagingSenderId: "209371697034",
+            appId: "1:209371697034:web:492a36d6f63326fa8f8273",
+            measurementId: "G-V1RLP62KJK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
+    </script>
+
+    <script type="module" src="teacher.js"></script>
+</body>
+
+</html>
